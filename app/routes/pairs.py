@@ -24,26 +24,17 @@ async def get_pairs(user_id: Optional[str] = None):
         pinned_pairs_cursor = db.pinned_pairs.find({"user_id": user_id})
         pinned_pairs = await pinned_pairs_cursor.to_list(None)
 
-        # Проверяем актуальность закрепленных пар
-        active_pair_ids = [str(pair["_id"]) for pair in active_pairs]
-        
-        for pinned in pinned_pairs:
-            pinned["is_active"] = str(pinned["pair_id"]) in active_pair_ids
-
-        # Формируем ответ
+        # Возвращаем все активные пары и закрепленные пары
         response = {
             "pinned_pairs": json.loads(json_util.dumps(pinned_pairs)),
-            "active_pairs": json.loads(json_util.dumps([
-                pair for pair in active_pairs 
-                if str(pair["_id"]) not in [str(p["pair_id"]) for p in pinned_pairs]
-            ]))
+            "active_pairs": json.loads(json_util.dumps(active_pairs))  # Возвращаем все активные пары
         }
         
         return response
 
     except Exception as e:
-        print(f"Error in get_pairs: {e}")  # Для отладки
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in get_pairs: {e}")
+        raise HTTPException(status_code=500, detail=str(e)
 
 @router.post("/{pair_id}/pin")
 async def pin_pair(pair_id: str, user_id: str):
