@@ -34,7 +34,7 @@ async def get_pairs(user_id: Optional[str] = None):
 
     except Exception as e:
         print(f"Error in get_pairs: {e}")
-        raise HTTPException(status_code=500, detail=str(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{pair_id}/pin")
 async def pin_pair(pair_id: str, user_id: str):
