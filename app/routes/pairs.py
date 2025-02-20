@@ -16,6 +16,15 @@ async def get_pairs(user_id: Optional[str] = None):
         active_pairs_cursor = db.active_pairs.find()
         active_pairs = await active_pairs_cursor.to_list(None)
 
+        # Добавляем alive_time для каждой пары, если его нет
+        for pair in active_pairs:
+            if 'alive_time' not in pair:
+                await db.active_pairs.update_one(
+                    {'_id': pair['_id']},
+                    {'$set': {'alive_time': datetime.utcnow()}}
+                )
+                pair['alive_time'] = datetime.utcnow()
+        
         if not user_id:
             # Если user_id не указан, возвращаем все активные пары
             return {"active_pairs": json.loads(json_util.dumps(active_pairs))}
